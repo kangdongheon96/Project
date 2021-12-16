@@ -43,11 +43,17 @@ cv2.imshow('2',img_blurred)
 cv2.waitKey(0)
 
 img_thresh = cv2.adaptiveThreshold(
+    
     img_blurred, 
+    
     maxValue=255.0, 
+    
     adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+    
     thresholdType=cv2.THRESH_BINARY_INV, 
+    
     blockSize=19, 
+    
     C=9
 )
 
@@ -61,6 +67,7 @@ cv2.waitKey(0)
 
 
 contours, _= cv2.findContours(img_thresh,mode=cv2.RETR_TREE,
+
                               method=cv2.CHAIN_APPROX_SIMPLE)
 
 temp_result = np.zeros((height, width, channel), dtype=np.uint8)
@@ -73,8 +80,11 @@ temp_result = np.zeros((height, width, channel), dtype=np.uint8)
 contours_dict = []
 
 for contour in contours:
+
     x, y, w, h = cv2.boundingRect(contour)
+    
     cv2.rectangle(temp_result, pt1=(x, y), pt2=(x+w, y+h), 
+    
                   color=(255, 255, 255), thickness=2)
     
     
@@ -105,8 +115,11 @@ MIN_RATIO, MAX_RATIO = 0.25, 1.0
 possible_contours = []
 
 cnt = 0
+
 for d in contours_dict:
+
     area = d['w'] * d['h']
+    
     ratio = d['w'] / d['h']
     
     if area > MIN_AREA \
@@ -144,6 +157,7 @@ MAX_HEIGHT_DIFF = 0.2
 MIN_N_MATCHED = 3 
 
 def find_chars(contour_list):
+
     matched_result_idx = []
     
     for d1 in contour_list:
@@ -200,6 +214,7 @@ result_idx = find_chars(possible_contours)
 matched_result = []
 
 for idx_list in result_idx:
+
     matched_result.append(np.take(possible_contours, idx_list))
 
 temp_result = np.zeros((height, width, channel), dtype=np.uint8)
@@ -233,6 +248,7 @@ plate_imgs = []
 plate_infos = []
 
 for i, matched_chars in enumerate(matched_result):
+
     sorted_chars = sorted(matched_chars, key=lambda x: x['cx'])
 
     plate_cx = (sorted_chars[0]['cx'] + sorted_chars[-1]['cx']) / 2
@@ -286,11 +302,15 @@ longest_idx, longest_text = -1, 0
 plate_chars = []
 
 for i, plate_img in enumerate(plate_imgs):
+
     plate_img = cv2.resize(plate_img, dsize=(0, 0), fx=1.6, fy=1.6)
+    
     _, plate_img = cv2.threshold(plate_img, thresh=0.0, maxval=255.0, type=cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     
     contours, _= cv2.findContours(plate_img,mode=cv2.RETR_LIST,method=cv2.CHAIN_APPROX_SIMPLE)
+    
     plate_min_x, plate_min_y = plate_img.shape[1], plate_img.shape[0]
+    
     plate_max_x, plate_max_y = 0, 0
 
     for contour in contours:
