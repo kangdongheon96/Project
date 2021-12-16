@@ -1,30 +1,45 @@
 import cv2
+
 import numpy as np
+
 import matplotlib.pyplot as plt
+
 import pytesseract
+
 import PIL
+
 plt.style.use('dark_background')
 
 img = cv2.imread('Capture.png')
+
 height, width, channel = img.shape
 
+
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
 plt.figure(figsize=(12, 10))
+
 plt.imshow(gray, cmap='gray')
+
 cv2.imshow('1',gray)
+
 cv2.waitKey(0)
 
 
 structuringElement = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
 
 imgTopHat = cv2.morphologyEx(gray, cv2.MORPH_TOPHAT, structuringElement)
+
 imgBlackHat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, structuringElement)
 
 imgGrayscalePlusTopHat = cv2.add(gray, imgTopHat)
+
 gray = cv2.subtract(imgGrayscalePlusTopHat, imgBlackHat)
+
 img_blurred = cv2.GaussianBlur(gray, ksize=(5, 5), sigmaX=0)
 
 cv2.imshow('2',img_blurred)
+
 cv2.waitKey(0)
 
 img_thresh = cv2.adaptiveThreshold(
@@ -37,9 +52,13 @@ img_thresh = cv2.adaptiveThreshold(
 )
 
 plt.figure(figsize=(12, 10))
+
 plt.imshow(img_thresh, cmap='gray')
+
 cv2.imshow('3',img_thresh)
+
 cv2.waitKey(0)
+
 
 contours, _= cv2.findContours(img_thresh,mode=cv2.RETR_TREE,
                               method=cv2.CHAIN_APPROX_SIMPLE)
@@ -70,13 +89,17 @@ for contour in contours:
     })
 
 plt.figure(figsize=(12, 10))
+
 plt.imshow(temp_result, cmap='gray')
 
 cv2.imshow('4',temp_result)
+
 cv2.waitKey(0)
 
 MIN_AREA = 80
+
 MIN_WIDTH, MIN_HEIGHT = 2, 8
+
 MIN_RATIO, MAX_RATIO = 0.25, 1.0
 
 possible_contours = []
@@ -101,15 +124,23 @@ for d in possible_contours:
                   color=(255, 255, 255), thickness=2)
 
 plt.figure(figsize=(12, 10))
+
 plt.imshow(temp_result, cmap='gray')
+
 cv2.imshow('5',temp_result)
+
 cv2.waitKey(0)
 
 MAX_DIAG_MULTIPLYER = 5 
+
 MAX_ANGLE_DIFF = 12.0 
+
 MAX_AREA_DIFF = 0.5 
+
 MAX_WIDTH_DIFF = 0.8
+
 MAX_HEIGHT_DIFF = 0.2
+
 MIN_N_MATCHED = 3 
 
 def find_chars(contour_list):
@@ -167,6 +198,7 @@ def find_chars(contour_list):
 result_idx = find_chars(possible_contours)
 
 matched_result = []
+
 for idx_list in result_idx:
     matched_result.append(np.take(possible_contours, idx_list))
 
@@ -180,17 +212,24 @@ for r in matched_result:
                       color=(255, 255, 255), thickness=2)
 
 plt.figure(figsize=(12, 10))
+
 plt.imshow(temp_result, cmap='gray')
+
 cv2.imshow('6',temp_result)
+
 cv2.waitKey(0)
 
 
 PLATE_WIDTH_PADDING = 1.3
+
 PLATE_HEIGHT_PADDING = 1.5
+
 MIN_PLATE_RATIO = 3
+
 MAX_PLATE_RATIO = 10
 
 plate_imgs = []
+
 plate_infos = []
 
 for i, matched_chars in enumerate(matched_result):
@@ -243,6 +282,7 @@ for i, matched_chars in enumerate(matched_result):
 
 
 longest_idx, longest_text = -1, 0
+
 plate_chars = []
 
 for i, plate_img in enumerate(plate_imgs):
@@ -301,6 +341,7 @@ for i, plate_img in enumerate(plate_imgs):
 
 
 info = plate_infos[longest_idx]
+
 chars = plate_chars[longest_idx]
 
 img_out = img.copy()
@@ -308,9 +349,12 @@ img_out = img.copy()
 cv2.rectangle(img_out, pt1=(info['x'], info['y']), pt2=(info['x']+info['w'], info['y']+info['h']), color=(255,0,0), thickness=2)
 
 plt.figure(figsize=(12, 10))
+
 plt.imshow(img_out)
 
 cv2.imshow('9',img_out)
+
 cv2.waitKey(0)
+
 cv2.destroyAllWindows()
 
