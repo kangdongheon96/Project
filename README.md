@@ -32,7 +32,6 @@ cv2.drawContours(img1,cnts,-1,(0,255,0),3)
 cv2.imshow("img1",img1)
 cv2.waitKey(0)
 
-#sorts contours based on minimum area 30 and ignores the ones below that
 
 cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:30]
 screenCnt = None 
